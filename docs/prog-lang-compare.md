@@ -39,7 +39,7 @@
 <td class="org-left">Network</td>
 <td class="org-left">OS Network Stack, DPDK</td>
 <td class="org-left">OS Network Stack, DPDK (through bindings)</td>
-<td class="org-left">OS Network Stack, DPDK</td>
+<td class="org-left">OS Network Stack, DPDK (through bindings)</td>
 <td class="org-left">OS Netowrk Stack</td>
 </tr>
 
@@ -59,6 +59,33 @@
 <td class="org-left">Garbage Collection</td>
 <td class="org-left">Reference Count</td>
 <td class="org-left">Garbage Collection</td>
+</tr>
+
+
+<tr>
+<td class="org-left">Generics Support</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+</tr>
+
+
+<tr>
+<td class="org-left">Closure Support</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+</tr>
+
+
+<tr>
+<td class="org-left">Package Repository</td>
+<td class="org-left">No</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
 </tr>
 
 
