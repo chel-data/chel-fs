@@ -1,4 +1,5 @@
 
+
 # Compare Optional Programming Languages
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -20,7 +21,7 @@
 <th scope="col" class="org-left">Features\Language</th>
 <th scope="col" class="org-left">C/C++</th>
 <th scope="col" class="org-left">GO</th>
-<th scope="col" class="org-left">RUST</th>
+<th scope="col" class="org-left">RUST(Selected)</th>
 <th scope="col" class="org-left">Java/Scala</th>
 </tr>
 </thead>
@@ -28,16 +29,16 @@
 <tbody>
 <tr>
 <td class="org-left">Threading Model</td>
-<td class="org-left">OS Thread, Job/Task Model, Actor Model</td>
-<td class="org-left">Goroutine</td>
-<td class="org-left">OS Thread, Async/Wait</td>
+<td class="org-left">OS Thread, Job/Task Model, Actor Model : Seastar framework - share nothing, message passing, futures and promises https://seastar.io/ </td>
+<td class="org-left">Goroutine, channels</td>
+<td class="org-left">OS Thread, Async/Wait, https://doc.rust-lang.org/book/ch16-00-concurrency.html </td>
 <td class="org-left">OS Thread, Actor Model</td>
 </tr>
 
 
 <tr>
 <td class="org-left">Network</td>
-<td class="org-left">OS Network Stack, DPDK</td>
+<td class="org-left">OS Network Stack, DPDK(SeaStar Framework)</td>
 <td class="org-left">OS Network Stack, DPDK (through bindings)</td>
 <td class="org-left">OS Network Stack, DPDK (through bindings)</td>
 <td class="org-left">OS Netowrk Stack</td>
