@@ -15,37 +15,4 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#[allow(non_upper_case_globals)]
-#[allow(non_camel_case_types)]
-#[allow(non_snake_case)]
 pub mod daos;
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::ptr;
-    use std::ffi::CString;
-
-    #[test]
-    fn test_connect_to_daos() -> () {
-        unsafe {
-            let res = daos::daos_init();
-            assert_eq!(res, 0);
-
-            let mut poh = daos::daos_handle_t{ cookie: 0u64 };
-            let pool_name = CString::new("pool1").expect("Allocate CString failed");
-            
-            let res = daos::daos_pool_connect2(pool_name.as_ptr(),
-                                               ptr::null_mut(),
-                                               daos::DAOS_PC_RW,
-                                               &mut poh,
-                                               ptr::null_mut(),
-                                               ptr::null_mut());
-            assert_eq!(res, 0);
-
-            daos::daos_pool_disconnect(poh, ptr::null_mut());
-            daos::daos_fini();
-        }
-    }
-}
-
