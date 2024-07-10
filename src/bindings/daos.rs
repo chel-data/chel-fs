@@ -37,11 +37,11 @@ mod tests {
             let pool_name = CString::new("pool1").expect("Allocate CString failed");
             
             let res = daos_pool_connect2(pool_name.as_ptr(),
-                                               ptr::null_mut(),
-                                               DAOS_PC_RW,
-                                               &mut poh,
-                                               ptr::null_mut(),
-                                               ptr::null_mut());
+                                         ptr::null_mut(),
+                                         DAOS_PC_RW,
+                                         &mut poh,
+                                         ptr::null_mut(),
+                                         ptr::null_mut());
             assert_eq!(res, 0);
 
             daos_pool_disconnect(poh, ptr::null_mut());

@@ -15,10 +15,3 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-pub mod bindings;
-pub mod utils;
-pub mod client;
-
-fn main() {
-    println!("Hello, Chel-FS!");
-}
