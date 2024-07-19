@@ -15,31 +15,67 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use std::ptr;
 use std::ffi::CString;
+use std::option::Option;
+use std::option::Option::None;
+use std::option::Option::Some;
+use std::ptr;
+use std::sync::Once;
+use crate::bindings::daos::DAOS_COO_RW;
+use crate::bindings::daos::DAOS_PC_RW;
+use crate::bindings::daos::daos_cont_close;
+use crate::bindings::daos::daos_cont_open2;
 use crate::bindings::daos::daos_handle_t;
+use crate::bindings::daos::daos_init;
 use crate::bindings::daos::daos_pool_connect2;
 use crate::bindings::daos::daos_pool_disconnect;
-use crate::bindings::daos::daos_cont_open2;
-use crate::bindings::daos::daos_cont_close;
-use crate::bindings::daos::DAOS_PC_RW;
-use crate::bindings::daos::DAOS_COO_RW;
 
 #[derive(Debug)]
-struct DAOSConn {
+pub struct DAOSConn {
     poh: daos_handle_t,
     coh: daos_handle_t,
     valid_poh: bool,
     valid_coh: bool,
 }
 
+static mut INIT_RES: i32 = 0;
+static INIT_DAOS: Once = Once::new();
+
 impl DAOSConn {
-    fn new() -> Box<DAOSConn> {
-        Box::new(DAOSConn{ poh: daos_handle_t{ cookie: 0u64 }, coh: daos_handle_t{ cookie: 0u64 }, valid_poh: false, valid_coh: false })
+    pub fn new(pool_name: &str, cont_name: &str) -> Option<Box<DAOSConn>> {
+        let mut box_conn = Box::new(DAOSConn{ poh: daos_handle_t{ cookie: 0u64 }, coh: daos_handle_t{ cookie: 0u64 }, valid_poh: false, valid_coh: false });
+        let res = box_conn.connect(pool_name, cont_name);
+        if res != 0 {
+            None
+        } else {
+            Some(box_conn)
+        }
     }
 
+    pub fn get_poh(& self) -> Option<daos_handle_t> {
+        match self.valid_poh {
+            true => Some(self.poh),
+            false => None,
+        }
+    }
+
+    pub fn get_coh(& self) -> Option<daos_handle_t> {
+        match self.valid_coh {
+            true => Some(self.coh),
+            false => None,
+        }
+    }
+    
     fn connect(&mut self, pool_name: &str, cont_name: &str) -> i32 {
         unsafe {
+            INIT_DAOS.call_once(|| {
+                INIT_RES = daos_init();
+            });
+            if INIT_RES != 0 {
+                println!("init failed with result {}", INIT_RES);
+                return INIT_RES;
+            }
+
             let cpool_name = CString::new(pool_name).expect("create c pool_name failed");
             let ccont_name = CString::new(cont_name).expect("create c cont_name failed");
 
@@ -50,6 +86,7 @@ impl DAOSConn {
                                          ptr::null_mut(),
                                          ptr::null_mut());
             if res != 0 {
+                println!("daos_pool_connect2 failed with result {}", res);
                 return res as i32;
             } else {
                 self.valid_poh = true;
@@ -62,6 +99,7 @@ impl DAOSConn {
                                       ptr::null_mut(),
                                       ptr::null_mut());
             if res != 0 {
+                println!("daos_cont_open2 failed with result {}", res);
                 return res as i32;
             } else {
                 self.valid_coh = true;
@@ -71,17 +109,38 @@ impl DAOSConn {
         }
     }
 }
-    
 
 impl Drop for DAOSConn {
     fn drop(&mut self) {
         unsafe {
             if self.valid_coh {
+                println!("cont handle {} is closed", self.coh.cookie);
                 daos_cont_close(self.coh, ptr::null_mut());
+                self.valid_coh = false;
             }
             if self.valid_poh {
+                println!("pool handle {} is closed", self.poh.cookie);
                 daos_pool_disconnect(self.poh, ptr::null_mut());
+                self.valid_poh = false;
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_daos_conn() -> () {
+        let pool_name: &'static str = "pool1";
+        let cont_name: &'static str = "cont1";
+
+        let daos_conn = DAOSConn::new(pool_name, cont_name);
+
+        match daos_conn {
+            Some(x) => println!("get some daos conn"),
+            None => println!("connect to daos conn failed"),
         }
     }
 }

@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+fuser = { version = "0.14.0", features = ["abi-7-11"] }
+libc = "0.2.155"
+serde = "1.0.204"
+zvariant = "4.1.2"
 
 [build-dependencies]
 bindgen = "0.69.4"

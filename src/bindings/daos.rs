@@ -21,6 +21,8 @@
 
 include!(concat!(env!("OUT_DIR"), "/daos-bindings.rs"));
 
+pub const DAOS_TXN_NONE: daos_handle_t = daos_handle_t {cookie: 0u64};
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -28,7 +30,7 @@ mod tests {
     use std::ffi::CString;
 
     #[test]
-    fn test_connect_to_daos() -> () {
+    fn test_daos_binding_basic() -> () {
         unsafe {
             let res = daos_init();
             assert_eq!(res, 0);

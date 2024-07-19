@@ -53,6 +53,7 @@ fn main() {
         .allowlist_file("/usr/include/daos_mgmt.h")
         .allowlist_file("/usr/include/daos_s3.h")
         .allowlist_file("/usr/include/daos_version.h")
+        .allowlist_file("/usr/include/gurt/types.h")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
