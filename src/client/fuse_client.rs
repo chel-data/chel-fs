@@ -20,6 +20,7 @@ use crate::bindings::daos::{
     DAOS_COND_DKEY_FETCH,
     DAOS_COND_DKEY_UPDATE,
     DAOS_OO_RO,
+    DAOS_OO_RW,
     DAOS_REC_ANY,
     DAOS_TXN_NONE,
     DER_NONEXIST,
@@ -81,7 +82,7 @@ use std::{
 };
 use zvariant::{LE, Type, serialized::Context, serialized::Data, to_bytes};
 
-const ROOT_INODE_NUMBER: u64 = 0;
+const ROOT_INODE_NUMBER: u64 = 1;
 const INODE_AKEY: &str = "INODE_ENTRY";
 
 struct RawWrapper<T> {
@@ -239,7 +240,7 @@ impl FUSEClient {
         }
     }
 
-    fn open_root(&mut self) -> Result<daos_handle_t, i32> {
+    fn open_root(&mut self, read_only: bool) -> Result<daos_handle_t, i32> {
         let root_handle = self.ino_obj_map.get(&ROOT_INODE_NUMBER);
         let root_oid = match root_handle {
             Some(hdl) => hdl.oid,
@@ -251,8 +252,13 @@ impl FUSEClient {
                 oid
             },
         };
-        
-        let hdl = self.open_obj(root_oid, DAOS_OO_RO);
+
+        let flags = if read_only {
+            DAOS_OO_RO
+        } else {
+            DAOS_OO_RW
+        };
+        let hdl = self.open_obj(root_oid, flags);
         if hdl.is_ok() {
             Ok(hdl.unwrap())
         } else {
@@ -405,7 +411,7 @@ impl Filesystem for FUSEClient {
             return;
         }
 
-        let root_obj = self.open_root();
+        let root_obj = self.open_root(true);
         if root_obj.is_err() {
             reply.error(root_obj.unwrap_err());
             return;
@@ -454,7 +460,7 @@ impl Filesystem for FUSEClient {
                 ctime: UNIX_EPOCH,
                 crtime: UNIX_EPOCH,
                 kind: FileType::Directory,
-                perm: 0o555,
+                perm: 0o755,
                 nlink: 2,
                 uid: 0,
                 gid: 0,
@@ -493,7 +499,7 @@ impl Filesystem for FUSEClient {
     }
 
     fn readdir(&mut self, _req: &Request, _ino: u64, _fh: u64, offset: i64, mut reply: ReplyDirectory) {
-        let result = self.open_root();
+        let result = self.open_root(true);
         let Ok(obj_hdl) = result else {
             reply.error(result.unwrap_err());
             return;
@@ -570,6 +576,7 @@ impl Filesystem for FUSEClient {
     }
 
     fn create(&mut self, _req: &Request, parent: u64, name: &OsStr, mode_in: u32, _umask: u32, _flags: i32, reply: ReplyCreate) {
+        println!("enter create parent:{} mode:{}", parent, mode_in);
         if parent != ROOT_INODE_NUMBER {
             reply.error(EOPNOTSUPP);
             return;
@@ -580,7 +587,7 @@ impl Filesystem for FUSEClient {
             return;
         }
 
-        let result = self.open_root();
+        let result = self.open_root(false);
         let Ok(root_hdl) = result else {
             reply.error(result.unwrap_err());
             return;
@@ -611,6 +618,51 @@ impl Filesystem for FUSEClient {
         };
 
         reply.created(&Duration::new(0, 0), &new_entry.into(), 0, next_ino, 0);
+    }
+
+    fn mknod(&mut self, _req: &Request, parent: u64, name: &OsStr, mode_in: u32, _umask: u32, _rdev: u32, reply: ReplyEntry) {
+        println!("enter mknod parent:{} mode:{}", parent, mode_in);
+        if parent != ROOT_INODE_NUMBER {
+            reply.error(EOPNOTSUPP);
+            return;
+        }
+
+        if mode_in & libc::S_IFMT as u32 != libc::S_IFREG {
+            reply.error(EOPNOTSUPP);
+            return;
+        }
+
+        let result = self.open_root(false);
+        let Ok(root_hdl) = result else {
+            reply.error(result.unwrap_err());
+            return;
+        };
+
+        #[allow(unused_variables)]
+        let hdl_wrapper = RawTWrapper {obj: root_hdl, deallocator: FUSEClient::free_hdl};
+
+        let next_ino = alloc_inum();
+        let new_entry = InodeEntry {
+            mode: mode_in,
+            oid_lo: 0,
+            oid_hi: 0,
+            atime: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            mtime: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            ctime: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            crtime: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            uid: 0,
+            gid: 0,
+            inum: next_ino,
+            chunk_size: 0,
+        };
+
+        let result = self.create_entry(root_hdl, name.as_bytes(), &new_entry);
+        let Ok(_) = result else {
+            reply.error(result.unwrap_err());
+            return;
+        };
+
+        reply.entry(&Duration::ZERO, &new_entry.into(), 0);
     }
 
     fn open(&mut self, _req: &Request, ino: u64, _flags: i32, reply: ReplyOpen) {
