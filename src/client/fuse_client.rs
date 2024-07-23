@@ -18,6 +18,7 @@
 
 use crate::bindings::daos::{
     DAOS_COND_DKEY_FETCH,
+    DAOS_COND_DKEY_UPDATE,
     DAOS_OO_RO,
     DAOS_REC_ANY,
     DAOS_TXN_NONE,
@@ -31,11 +32,12 @@ use crate::bindings::daos::{
     daos_iod_type_t_DAOS_IOD_SINGLE,
     daos_key_desc_t,
     daos_key_t,
+    daos_obj_close,
     daos_obj_fetch,
     daos_obj_id_t,
     daos_obj_list_dkey,
     daos_obj_open,
-    daos_obj_close,
+    daos_obj_update,
     daos_prop_alloc,
     daos_prop_co_roots,
     daos_prop_entry_get,
@@ -53,6 +55,7 @@ use fuser::{
     MountOption,
     ReplyAttr,
     ReplyData,
+    ReplyCreate,
     ReplyDirectory,
     ReplyEmpty,
     ReplyEntry,
@@ -61,7 +64,6 @@ use fuser::{
 };
 use libc::{EFAULT, EINVAL, ENOENT, ENOMEM, EOPNOTSUPP};
 use serde::{Deserialize, Serialize};
-use std::result;
 use std::{
     collections::HashMap,
     ffi::CString,
@@ -74,7 +76,7 @@ use std::{
     ptr,
     result::Result,
     sync::atomic::{AtomicU64, Ordering},
-    time::{Duration, UNIX_EPOCH},
+    time::{Duration, SystemTime, UNIX_EPOCH},
     vec::Vec,
 };
 use zvariant::{LE, Type, serialized::Context, serialized::Data, to_bytes};
@@ -105,7 +107,7 @@ impl<T: Copy> Drop for RawTWrapper<T> {
 }
 
 #[derive(Deserialize, Serialize, Type, PartialEq, Debug)]
-struct InodeEntry{
+struct InodeEntry {
     mode: u32,
     oid_lo: u64,
     oid_hi: u64,
@@ -117,6 +119,28 @@ struct InodeEntry{
     gid: u32,
     inum: u64,
     chunk_size: u64,
+}
+
+impl From<InodeEntry> for FileAttr {
+    fn from(attrs: InodeEntry) -> Self {
+        FileAttr {
+            ino: attrs.inum,
+            size: attrs.chunk_size,
+            blocks: 0,
+            atime: UNIX_EPOCH.add(Duration::from_secs(attrs.atime)),
+            mtime: UNIX_EPOCH.add(Duration::from_secs(attrs.mtime)),
+            ctime: UNIX_EPOCH.add(Duration::from_secs(attrs.ctime)),
+            crtime: UNIX_EPOCH.add(Duration::from_secs(attrs.crtime)),
+            kind: FileType::RegularFile,
+            perm: 0o444,
+            nlink: 1,
+            uid: attrs.uid,
+            gid: attrs.gid,
+            rdev: 0,
+            flags: 0,
+            blksize: 0,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -148,6 +172,10 @@ fn decode_inode(bytes: &[u8]) -> zvariant::Result<(InodeEntry, usize)> {
 }
 
 impl FUSEClient {
+    fn free_hdl(hdl: daos_handle_t) {
+        let _ = FUSEClient::close_obj(hdl);
+    }
+
     fn open_obj(& self, oid: daos_obj_id_t, flags: u32) -> Result<daos_handle_t, i32> {
         unsafe {
             let coh = self.daos_conn.get_coh();
@@ -293,8 +321,64 @@ impl FUSEClient {
         }
     }
 
+    fn create_entry(&mut self, parent: daos_handle_t, name: &[u8], inode_entry: &InodeEntry) -> Result<i32, i32> {
+        let result = encode_inode(inode_entry);
+        let Ok(encode_data) = result else {
+            return Err(EFAULT);
+        };
+
+        let encoded_bytes: &[u8] = encode_data.bytes();
+
+        unsafe {
+            let mut dkey = daos_key_t {
+                iov_buf: name as *const [u8] as *mut [u8] as *mut c_void,
+                iov_buf_len: name.len(),
+                iov_len: name.len(),
+            };
+
+            let akey = CString::new(INODE_AKEY).unwrap();
+            let akey_bytes = akey.as_bytes();
+            let mut iod = daos_iod_t {
+                iod_name: daos_key_t {
+                    iov_buf: akey_bytes as *const [u8] as *mut [u8] as *mut c_void,
+                    iov_buf_len: akey_bytes.len(),
+                    iov_len: akey_bytes.len(),
+                },
+                iod_type: daos_iod_type_t_DAOS_IOD_SINGLE,
+                iod_size: encoded_bytes.len() as u64,
+                iod_flags: 0,
+                iod_nr: 1,
+                iod_recxs: ptr::null_mut(),
+            };
+            let mut sg_iov = d_iov_t {
+                iov_buf: encoded_bytes as *const [u8] as *mut [u8] as *mut c_void,
+                iov_buf_len: encoded_bytes.len(),
+                iov_len: encoded_bytes.len(),
+            };
+            let mut sgl = d_sg_list_t {
+                sg_nr: 1,
+                sg_nr_out: 0,
+                sg_iovs: &mut sg_iov,
+            };
+
+            let ret = daos_obj_update(parent,
+                                      DAOS_TXN_NONE,
+                                      DAOS_COND_DKEY_UPDATE as u64,
+                                      &mut dkey,
+                                      1,
+                                      &mut iod,
+                                      &mut sgl,
+                                      ptr::null_mut());
+            if ret != 0 {
+                return Err(EINVAL);
+            }
+
+            Ok(0)
+        }
+    }
+
     pub fn start_filesystem() -> Result<i32, i32> {
-        let options = vec![MountOption::RO, MountOption::FSName("fsel".to_string())];
+        let options = vec![MountOption::RW, MountOption::FSName("fsel".to_string())];
         let Some(box_conn) = DAOSConn::new("pool1", "cont1") else {
             return Err(EFAULT);
         };
@@ -315,7 +399,7 @@ impl FUSEClient {
 }
 
 impl Filesystem for FUSEClient {
-    fn lookup(&mut self, req: &Request, parent: u64, name: &OsStr, reply: ReplyEntry) {
+    fn lookup(&mut self, _req: &Request, parent: u64, name: &OsStr, reply: ReplyEntry) {
         if parent != ROOT_INODE_NUMBER {
             reply.error(ENOENT);
             return;
@@ -327,10 +411,12 @@ impl Filesystem for FUSEClient {
             return;
         }
 
+        #[allow(unused_variables)]
+        let hdl_wrapper = RawTWrapper {obj: root_obj.unwrap(), deallocator: FUSEClient::free_hdl};
+
         let name_bytes = name.as_bytes();
         let inode = self.get_inode_entry(root_obj.unwrap(), name_bytes);
         if inode.is_err() {
-            FUSEClient::close_obj(root_obj.unwrap());
             reply.error(inode.unwrap_err());
             return;
         }
@@ -355,7 +441,6 @@ impl Filesystem for FUSEClient {
         };
 
         reply.entry(&Duration::ZERO, &file_attr, 0);
-        FUSEClient::close_obj(root_obj.unwrap());
     }
 
     fn getattr(&mut self, _req: &Request, ino: u64, reply: ReplyAttr) {
@@ -397,23 +482,7 @@ impl Filesystem for FUSEClient {
                 }
 
                 let inode_entry = inode.unwrap();
-                let file_attr = FileAttr {
-                    ino: inode_entry.inum,
-                    size: inode_entry.chunk_size,
-                    blocks: 0,
-                    atime: UNIX_EPOCH.add(Duration::from_secs(inode_entry.atime)),
-                    mtime: UNIX_EPOCH.add(Duration::from_secs(inode_entry.mtime)),
-                    ctime: UNIX_EPOCH.add(Duration::from_secs(inode_entry.ctime)),
-                    crtime: UNIX_EPOCH.add(Duration::from_secs(inode_entry.crtime)),
-                    kind: FileType::RegularFile,
-                    perm: 0o444,
-                    nlink: 1,
-                    uid: inode_entry.uid,
-                    gid: inode_entry.gid,
-                    rdev: 0,
-                    flags: 0,
-                    blksize: 0,
-                };
+                let file_attr: FileAttr = inode_entry.into();
 
                 reply.attr(&Duration::ZERO, &file_attr);
             },
@@ -424,17 +493,14 @@ impl Filesystem for FUSEClient {
     }
 
     fn readdir(&mut self, _req: &Request, _ino: u64, _fh: u64, offset: i64, mut reply: ReplyDirectory) {
-        fn free_hdl(hdl: daos_handle_t) {
-            FUSEClient::close_obj(hdl);
-        }
-        
         let result = self.open_root();
         let Ok(obj_hdl) = result else {
             reply.error(result.unwrap_err());
             return;
         };
 
-        let hdl_wrapper = RawTWrapper {obj: obj_hdl, deallocator: free_hdl};
+        #[allow(unused_variables)]
+        let hdl_wrapper = RawTWrapper {obj: obj_hdl, deallocator: FUSEClient::free_hdl};
 
         const KEY_DESC_NUM: usize = 16;
         const KEY_DESC_BUF_SIZE: usize = 256;
@@ -501,6 +567,50 @@ impl Filesystem for FUSEClient {
 
             reply.ok();
         }
+    }
+
+    fn create(&mut self, _req: &Request, parent: u64, name: &OsStr, mode_in: u32, _umask: u32, _flags: i32, reply: ReplyCreate) {
+        if parent != ROOT_INODE_NUMBER {
+            reply.error(EOPNOTSUPP);
+            return;
+        }
+
+        if mode_in & libc::S_IFMT as u32 != libc::S_IFREG {
+            reply.error(EOPNOTSUPP);
+            return;
+        }
+
+        let result = self.open_root();
+        let Ok(root_hdl) = result else {
+            reply.error(result.unwrap_err());
+            return;
+        };
+
+        #[allow(unused_variables)]
+        let hdl_wrapper = RawTWrapper {obj: root_hdl, deallocator: FUSEClient::free_hdl};
+
+        let next_ino = alloc_inum();
+        let new_entry = InodeEntry {
+            mode: mode_in,
+            oid_lo: 0,
+            oid_hi: 0,
+            atime: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            mtime: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            ctime: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            crtime: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(),
+            uid: 0,
+            gid: 0,
+            inum: next_ino,
+            chunk_size: 0,
+        };
+
+        let result = self.create_entry(root_hdl, name.as_bytes(), &new_entry);
+        let Ok(_) = result else {
+            reply.error(result.unwrap_err());
+            return;
+        };
+
+        reply.created(&Duration::new(0, 0), &new_entry.into(), 0, next_ino, 0);
     }
 
     fn open(&mut self, _req: &Request, ino: u64, _flags: i32, reply: ReplyOpen) {
