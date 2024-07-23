@@ -23,6 +23,12 @@ include!(concat!(env!("OUT_DIR"), "/daos-bindings.rs"));
 
 pub const DAOS_TXN_NONE: daos_handle_t = daos_handle_t {cookie: 0u64};
 
+pub fn daos_anchor_is_eof(anchor: &daos_anchor_t) -> bool
+{
+    daos_anchor_type_t_DAOS_ANCHOR_TYPE_EOF == anchor.da_type.into()
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;

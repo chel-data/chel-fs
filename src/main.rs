@@ -19,6 +19,9 @@ pub mod bindings;
 pub mod utils;
 pub mod client;
 
+use client::fuse_client;
+
 fn main() {
     println!("Hello, Chel-FS!");
+    fuse_client::FUSEClient::start_filesystem().expect("fuse error");
 }

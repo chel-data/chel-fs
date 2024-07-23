@@ -22,14 +22,18 @@ use crate::bindings::daos::{
     DAOS_REC_ANY,
     DAOS_TXN_NONE,
     DER_NONEXIST,
+    daos_anchor_is_eof,
+    daos_anchor_t,
     daos_cont_props_DAOS_PROP_CO_ROOTS,
     daos_cont_query,
     daos_handle_t,
     daos_iod_t,
     daos_iod_type_t_DAOS_IOD_SINGLE,
+    daos_key_desc_t,
     daos_key_t,
     daos_obj_fetch,
     daos_obj_id_t,
+    daos_obj_list_dkey,
     daos_obj_open,
     daos_obj_close,
     daos_prop_alloc,
@@ -46,16 +50,18 @@ use fuser::{
     FileAttr,
     FileType,
     Filesystem,
+    MountOption,
     ReplyAttr,
     ReplyData,
     ReplyDirectory,
     ReplyEmpty,
     ReplyEntry,
     ReplyOpen,
-    Request
+    Request,
 };
 use libc::{EFAULT, EINVAL, ENOENT, ENOMEM, EOPNOTSUPP};
 use serde::{Deserialize, Serialize};
+use std::result;
 use std::{
     collections::HashMap,
     ffi::CString,
@@ -64,6 +70,7 @@ use std::{
     option::Option,
     os::raw::c_void,
     os::unix::ffi::OsStrExt,
+    path::Path,
     ptr,
     result::Result,
     sync::atomic::{AtomicU64, Ordering},
@@ -82,10 +89,18 @@ struct RawWrapper<T> {
 
 impl<T> Drop for RawWrapper<T> {
     fn drop(&mut self) {
-        if !self.raw_ptr.is_null() {
-            (self.deallocator)(self.raw_ptr);
-            self.raw_ptr = ptr::null_mut();
-        }
+        (self.deallocator)(self.raw_ptr);
+    }
+}
+
+struct RawTWrapper<T> where T: Copy {
+    obj: T,
+    deallocator: fn(T) -> (),
+}
+
+impl<T: Copy> Drop for RawTWrapper<T> {
+    fn drop(&mut self) {
+        (self.deallocator)(self.obj);
     }
 }
 
@@ -111,7 +126,7 @@ struct InodeInfo {
     name: Vec<u8>,
 }
 
-struct FUSEClient {
+pub struct FUSEClient {
     daos_conn: Box<DAOSConn>,
     ino_obj_map: HashMap<u64, InodeInfo>,
 }
@@ -150,7 +165,7 @@ impl FUSEClient {
         }
     }
 
-    fn close_obj(& self, hdl: daos_handle_t) -> Result<i32, i32> {
+    fn close_obj(hdl: daos_handle_t) -> Result<i32, i32> {
         unsafe {
             let ret = daos_obj_close(hdl, ptr::null_mut());
             if ret != 0 {
@@ -160,43 +175,52 @@ impl FUSEClient {
             }
         }
     }
-    
-    fn open_root(&mut self) -> Result<daos_handle_t, i32> {
+
+    fn get_root_oid(&mut self) -> Result<daos_obj_id_t, i32> {
         fn free_prop(prop: *mut daos_prop_t) {
             unsafe {
                 daos_prop_free(prop);
             }
         }
+        unsafe {
+            let prop = daos_prop_alloc(1);
+            if prop.is_null() {
+                return Err(ENOMEM);
+            }
 
+            let wrapper = RawWrapper {raw_ptr: prop, deallocator: free_prop};
+            (*(*wrapper.raw_ptr).dpp_entries).dpe_type = daos_cont_props_DAOS_PROP_CO_ROOTS;
+
+            let coh = self.daos_conn.get_coh();
+            if coh.is_none() {
+                return Err(EFAULT);
+            }
+
+            let ret = daos_cont_query(coh.unwrap(), ptr::null_mut(), prop, ptr::null_mut());
+            if ret != 0 {
+                return Err(EFAULT);
+            }
+
+            let entry = daos_prop_entry_get(prop, daos_cont_props_DAOS_PROP_CO_ROOTS);
+            let roots = (*entry).__bindgen_anon_1.dpe_val_ptr as *mut daos_prop_co_roots;
+            let root_oid = (*roots).cr_oids[1];
+
+            self.ino_obj_map.insert(ROOT_INODE_NUMBER, InodeInfo {oid: root_oid, parent_oid: daos_obj_id_t {lo: 0u64, hi: 0u64}, name: vec!['/' as u8]});
+
+            Ok(root_oid)
+        }
+    }
+
+    fn open_root(&mut self) -> Result<daos_handle_t, i32> {
         let root_handle = self.ino_obj_map.get(&ROOT_INODE_NUMBER);
         let root_oid = match root_handle {
             Some(hdl) => hdl.oid,
-            None => unsafe {
-                let prop = daos_prop_alloc(1);
-                if prop.is_null() {
-                    return Err(ENOMEM);
-                }
-
-                let wrapper = RawWrapper {raw_ptr: prop, deallocator: free_prop};
-                (*(*wrapper.raw_ptr).dpp_entries).dpe_type = daos_cont_props_DAOS_PROP_CO_ROOTS;
-
-                let coh = self.daos_conn.get_coh();
-                if coh.is_none() {
-                    return Err(EFAULT);
-                }
-
-                let ret = daos_cont_query(coh.unwrap(), ptr::null_mut(), prop, ptr::null_mut());
-                if ret != 0 {
-                    return Err(EFAULT);
-                }
-
-                let entry = daos_prop_entry_get(prop, daos_cont_props_DAOS_PROP_CO_ROOTS);
-                let roots = (*entry).__bindgen_anon_1.dpe_val_ptr as *mut daos_prop_co_roots;
-                let root_oid = (*roots).cr_oids[1];
-
-                self.ino_obj_map.insert(ROOT_INODE_NUMBER, InodeInfo {oid: root_oid, parent_oid: daos_obj_id_t {lo: 0u64, hi: 0u64}, name: vec!['/' as u8]});
-
-                root_oid
+            None => {
+                let result = self.get_root_oid();
+                let Ok(oid) = result else {
+                    return Err(result.unwrap_err());
+                };
+                oid
             },
         };
         
@@ -268,6 +292,26 @@ impl FUSEClient {
             Ok(decoded_result.unwrap().0)
         }
     }
+
+    pub fn start_filesystem() -> Result<i32, i32> {
+        let options = vec![MountOption::RO, MountOption::FSName("fsel".to_string())];
+        let Some(box_conn) = DAOSConn::new("pool1", "cont1") else {
+            return Err(EFAULT);
+        };
+
+        let fs = FUSEClient {
+            daos_conn: box_conn,
+            ino_obj_map: HashMap::new(),
+        };
+
+        let mntpt = Path::new("/mnt/fs1");
+
+        let result = fuser::mount2(fs, mntpt, &options);
+        let Ok(_) = result else {
+            return Err(EFAULT);
+        };
+        Ok(0)
+    }
 }
 
 impl Filesystem for FUSEClient {
@@ -286,7 +330,7 @@ impl Filesystem for FUSEClient {
         let name_bytes = name.as_bytes();
         let inode = self.get_inode_entry(root_obj.unwrap(), name_bytes);
         if inode.is_err() {
-            self.close_obj(root_obj.unwrap());
+            FUSEClient::close_obj(root_obj.unwrap());
             reply.error(inode.unwrap_err());
             return;
         }
@@ -311,7 +355,7 @@ impl Filesystem for FUSEClient {
         };
 
         reply.entry(&Duration::ZERO, &file_attr, 0);
-        self.close_obj(root_obj.unwrap());
+        FUSEClient::close_obj(root_obj.unwrap());
     }
 
     fn getattr(&mut self, _req: &Request, ino: u64, reply: ReplyAttr) {
@@ -379,8 +423,84 @@ impl Filesystem for FUSEClient {
         }
     }
 
-    fn readdir(&mut self, _req: &Request, _ino: u64, _fh: u64, _offset: i64, mut reply: ReplyDirectory) {
+    fn readdir(&mut self, _req: &Request, _ino: u64, _fh: u64, offset: i64, mut reply: ReplyDirectory) {
+        fn free_hdl(hdl: daos_handle_t) {
+            FUSEClient::close_obj(hdl);
+        }
         
+        let result = self.open_root();
+        let Ok(obj_hdl) = result else {
+            reply.error(result.unwrap_err());
+            return;
+        };
+
+        let hdl_wrapper = RawTWrapper {obj: obj_hdl, deallocator: free_hdl};
+
+        const KEY_DESC_NUM: usize = 16;
+        const KEY_DESC_BUF_SIZE: usize = 256;
+        unsafe {
+            let mut kds: [daos_key_desc_t; KEY_DESC_NUM] = [daos_key_desc_t {kd_key_len: 0, kd_val_type: 0}; KEY_DESC_NUM];
+            let mut anchor: daos_anchor_t = daos_anchor_t {da_type: 0u16, da_shard: 0u16, da_flags: 0u32, da_sub_anchors: 0u64, da_buf: [0u8; 104]};
+            let mut key_buf: [u8; KEY_DESC_BUF_SIZE] = [0u8; KEY_DESC_BUF_SIZE];
+            let mut key_idx: i64 = 0;
+            while !daos_anchor_is_eof(&anchor) {
+                let mut num_res: u32 = KEY_DESC_NUM as u32;
+                let mut sg_iov: d_iov_t = d_iov_t {
+                    iov_buf: &mut key_buf as *mut [u8] as *mut c_void,
+                    iov_buf_len: KEY_DESC_BUF_SIZE,
+                    iov_len: KEY_DESC_BUF_SIZE,
+                };
+                let mut sgl: d_sg_list_t = d_sg_list_t {
+                    sg_nr: 1,
+                    sg_nr_out: 0,
+                    sg_iovs: &mut sg_iov,
+                };
+
+                let ret = daos_obj_list_dkey(obj_hdl,
+                                             DAOS_TXN_NONE,
+                                             &mut num_res,
+                                             &mut kds[0usize],
+                                             &mut sgl,
+                                             &mut anchor,
+                                             ptr::null_mut());
+                if ret != 0 {
+                    reply.error(EFAULT);
+                    return;
+                }
+
+                let mut key_offset = 0u64;
+                for i in 0u32 .. num_res {
+                    let key_end = key_offset + kds[i as usize].kd_key_len;
+                    let key = &key_buf[key_offset as usize .. key_end as usize];
+                    if key_idx >= offset {
+                        let result = self.get_inode_entry(obj_hdl, key);
+                        let Ok(inode_entry) = result else {
+                            reply.error(result.unwrap_err());
+                            return;
+                        };
+                        if !self.ino_obj_map.contains_key(&inode_entry.inum) {
+                            let parent = self.ino_obj_map.get(&ROOT_INODE_NUMBER);
+                            self.ino_obj_map.insert(inode_entry.inum, InodeInfo {
+                                oid: daos_obj_id_t {
+                                    lo: inode_entry.oid_lo,
+                                    hi: inode_entry.oid_hi
+                                },
+                                parent_oid: parent.unwrap().oid,
+                                name: Vec::from(key),
+                            });
+                        }
+                        if reply.add(inode_entry.inum, key_idx, FileType::RegularFile, OsStr::from_bytes(key)) {
+                            reply.ok();
+                            return;
+                        }
+                    }
+                    key_offset += kds[i as usize].kd_key_len;
+                    key_idx += 1;
+                }
+            }
+
+            reply.ok();
+        }
     }
 
     fn open(&mut self, _req: &Request, ino: u64, _flags: i32, reply: ReplyOpen) {
