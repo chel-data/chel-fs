@@ -13,12 +13,11 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
  */
 
 use crate::bindings::daos::{
     DAOS_COND_DKEY_FETCH,
-    DAOS_COND_DKEY_UPDATE,
+    DAOS_COND_DKEY_INSERT,
     DAOS_OO_RO,
     DAOS_OO_RW,
     DAOS_REC_ANY,
@@ -330,6 +329,7 @@ impl FUSEClient {
     fn create_entry(&mut self, parent: daos_handle_t, name: &[u8], inode_entry: &InodeEntry) -> Result<i32, i32> {
         let result = encode_inode(inode_entry);
         let Ok(encode_data) = result else {
+            println!("encode inode entry failed");
             return Err(EFAULT);
         };
 
@@ -369,13 +369,14 @@ impl FUSEClient {
 
             let ret = daos_obj_update(parent,
                                       DAOS_TXN_NONE,
-                                      DAOS_COND_DKEY_UPDATE as u64,
+                                      DAOS_COND_DKEY_INSERT as u64,
                                       &mut dkey,
                                       1,
                                       &mut iod,
                                       &mut sgl,
                                       ptr::null_mut());
             if ret != 0 {
+                println!("daos object update failed, ret:{}", ret);
                 return Err(EINVAL);
             }
 
@@ -504,6 +505,7 @@ impl Filesystem for FUSEClient {
             reply.error(result.unwrap_err());
             return;
         };
+        println!("enter readdir ino:{} offset:{}", _ino, offset);
 
         #[allow(unused_variables)]
         let hdl_wrapper = RawTWrapper {obj: obj_hdl, deallocator: FUSEClient::free_hdl};
@@ -511,14 +513,14 @@ impl Filesystem for FUSEClient {
         const KEY_DESC_NUM: usize = 16;
         const KEY_DESC_BUF_SIZE: usize = 256;
         unsafe {
-            let mut kds: [daos_key_desc_t; KEY_DESC_NUM] = [daos_key_desc_t {kd_key_len: 0, kd_val_type: 0}; KEY_DESC_NUM];
+            let mut kds = vec![daos_key_desc_t {kd_key_len: 0, kd_val_type: 0}; KEY_DESC_NUM];
             let mut anchor: daos_anchor_t = daos_anchor_t {da_type: 0u16, da_shard: 0u16, da_flags: 0u32, da_sub_anchors: 0u64, da_buf: [0u8; 104]};
-            let mut key_buf: [u8; KEY_DESC_BUF_SIZE] = [0u8; KEY_DESC_BUF_SIZE];
+            let mut key_buf = vec![0u8; KEY_DESC_BUF_SIZE];
             let mut key_idx: i64 = 0;
             while !daos_anchor_is_eof(&anchor) {
                 let mut num_res: u32 = KEY_DESC_NUM as u32;
                 let mut sg_iov: d_iov_t = d_iov_t {
-                    iov_buf: &mut key_buf as *mut [u8] as *mut c_void,
+                    iov_buf: key_buf.as_mut_ptr() as *mut c_void,
                     iov_buf_len: KEY_DESC_BUF_SIZE,
                     iov_len: KEY_DESC_BUF_SIZE,
                 };
@@ -531,7 +533,7 @@ impl Filesystem for FUSEClient {
                 let ret = daos_obj_list_dkey(obj_hdl,
                                              DAOS_TXN_NONE,
                                              &mut num_res,
-                                             &mut kds[0usize],
+                                             kds.as_mut_ptr(),
                                              &mut sgl,
                                              &mut anchor,
                                              ptr::null_mut());
@@ -545,6 +547,7 @@ impl Filesystem for FUSEClient {
                     let key_end = key_offset + kds[i as usize].kd_key_len;
                     let key = &key_buf[key_offset as usize .. key_end as usize];
                     if key_idx >= offset {
+                        key_idx += 1;
                         let result = self.get_inode_entry(obj_hdl, key);
                         let Ok(inode_entry) = result else {
                             reply.error(result.unwrap_err());
@@ -561,13 +564,13 @@ impl Filesystem for FUSEClient {
                                 name: Vec::from(key),
                             });
                         }
+                        println!("readdir get entry ino:{} offset:{} name:{}", inode_entry.inum, key_idx, std::str::from_utf8(key).unwrap());
                         if reply.add(inode_entry.inum, key_idx, FileType::RegularFile, OsStr::from_bytes(key)) {
                             reply.ok();
                             return;
                         }
                     }
                     key_offset += kds[i as usize].kd_key_len;
-                    key_idx += 1;
                 }
             }
 
@@ -576,7 +579,7 @@ impl Filesystem for FUSEClient {
     }
 
     fn create(&mut self, _req: &Request, parent: u64, name: &OsStr, mode_in: u32, _umask: u32, _flags: i32, reply: ReplyCreate) {
-        println!("enter create parent:{} mode:{}", parent, mode_in);
+        println!("enter create parent:{} name:{} mode:{}", parent, name.to_str().unwrap(), mode_in);
         if parent != ROOT_INODE_NUMBER {
             reply.error(EOPNOTSUPP);
             return;
@@ -614,10 +617,12 @@ impl Filesystem for FUSEClient {
         let result = self.create_entry(root_hdl, name.as_bytes(), &new_entry);
         let Ok(_) = result else {
             reply.error(result.unwrap_err());
+            println!("create failed parent:{} name:{} ino:{}", parent, name.to_str().unwrap(), next_ino);
             return;
         };
 
         reply.created(&Duration::new(0, 0), &new_entry.into(), 0, next_ino, 0);
+        println!("created parent:{} name:{} ino:{} mode:{}", parent, name.to_str().unwrap(), next_ino, mode_in);
     }
 
     fn mknod(&mut self, _req: &Request, parent: u64, name: &OsStr, mode_in: u32, _umask: u32, _rdev: u32, reply: ReplyEntry) {
