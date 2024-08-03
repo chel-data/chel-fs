@@ -26,7 +26,7 @@ The main objective of Chel-FS is to provide a disaggregated Distributed File Sys
 DAOS is capable to handle high volumes of Parallel Data Operations. But for high volumes of small file metadata operations
 there is a need that this compute responsibility is distributed among disjoint file system metadata compute entities. We call these file system metadata compute entities as Chel-Fs MDS.
 ## Chel-Fs Metadata Service (MDS)  
-As defined above, Chel-Fs
+As defined above, Chel-Fs 
 ## Chel-Fs Client  
 ## DAOS and Chel-Fs entity relationship  
 ## Chel-Fs Snapshots  
