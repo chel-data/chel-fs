@@ -7,6 +7,7 @@
   - [Disaggregated Distributed File System Service](#disaggregated-distributed-file-system-service)
   - [Chel-FS Metadata Service (MDS)](#chel-fs-metadata-service-mds)
     - [Sharded Compute Responsibility](#sharded-compute-responsibility)
+      - [Adding and removing MDSs](#adding-and-removing-mdss)
     - [Delegate Locks and Capabilities](#delegate-locks-and-capabilities)
     - [FS layout on DAOS containers](#fs-layout-on-daos-containers)
     - [Distributed Transaction Synchronization](#distributed-transaction-synchronization)
@@ -16,7 +17,7 @@
   - [Chel-FS Quotas](#chel-fs-quotas)
   - [Chel-Helm](#chel-helm)
 - [Chel-FS Internal Components](#chel-fs-internal-components)
-- [Metadata Structures(Proto)](#metadata-structuresproto)
+- [Metadata Entities in Chel-fs and their Structures(Proto)](#metadata-entities-in-chel-fs-and-their-structuresproto)
 - [HLD for File Operation](#hld-for-file-operation)
 
 # Chel-FS
@@ -35,24 +36,32 @@ there is a need that this compute responsibility is distributed among disjoint f
 ## Chel-FS Metadata Service (MDS)  
 As defined above, Chel-FS MDS (referred as MDS in the future) is responsible for following,
 ### Sharded Compute Responsibility
-Chel-FS metadata is sharded amongst a N number of MDS. The sharding of metadata entities is done on some properties of the entity For example:
-It would usual to shard inodes using the inode's primary parent inode. (Note: A inode can have multiple parents due to multiple hardlinks, though this is exception for directories, as directories will have only 1 parent inode). 
-The sharding is dictated on the following factors,
+
+Chel-FS metadata is sharded amongst all the MDSs of the Cluster. The sharding of metadata entities is done on some properties of the sharded metadata entity
+
+The sharding scheme is dictated on the following factors,
 1. Optimal Layout of Chel-FS metadata on DAOS Objects. 
-2. Disjoint Metadata Operations(most of the times) i,e 1 Metadata operation would most of the time involve 1 MDS.
-   1. Less number of network hops for 1 Metadata operation
-   2. Less number OR None distributed transaction/s in a metadata operation 
-3. Ease of Predictive Caching (Read-ahead caching)
+2. Disjoint Metadata Operations between MDSs (most of the times) i,e 1 Metadata operation would most of the time involve 1 MDS.
+   1. Limited number of network hops for a Metadata operation
+   2. Limited OR None distributed transaction/s (involving multiple MDSs) for a metadata operation.
+3. Ease of Predictive Caching (Read-ahead caching) on a MDS
 4. Ease of rebuild/reload during a failover or failback of MDS.
-5. 
+5. Ease of adding or removing MDSs with minimal distributed synchronizations between MDSs.
 (TODO : Details in LLD of MDS Sharding)
 
-Chel-FS cluster could have multiple file systems created and all the metadata of all these filesystems would be sharded on N number of MDS of the cluster.
+For example: In case of Inode being the sharded metadata entity,
+it is most likely to shard inodes using the inode's primary parent inode. (Note: A inode can have multiple parents due to multiple hardlinks, though this is exception for directories, as directories will have only 1 parent inode). The driving factor to this scheme of sharding is to keep Inodes of all the dentries belonging to a directory in the same shard, so that most frequent operations like readdir() or readdir_plus() (ls) won't have to hop around too many MDSs and the owning MDS can do a read ahead caching for a reentrant metadata operation like readdir. This also helps in maintaining a consistent view of the changing directory without have to have too many coordination or synchronization rpc calls amongst multiple MDS.
 
-Since storage/DAOS is ubiquitous i.e accessed by all the MDS without having any storage affinity, The number of MDS in a cluster can be increased or decreased seamlessly, depending on Compute requirements of the workload.
 
+Chel-FS cluster could have multiple file systems and all the metadata of these filesystems would be sharded on N number of MDS of the cluster.
+#### Adding and removing MDSs
+The User/Admin should be able to add or remove MDSs depending on performance or cost needs.
+Since storage/DAOS is ubiquitous (i.e accessed by all the MDS without having any storage affinity),
+The number of MDS in a cluster can be increased or decreased seamlessly, depending on compute requirements of the workload or cost.
 ### Delegate Locks and Capabilities
+Chel-FS MDS would be hosting Chel-FS client locks/delegation on metadata entities (like Inode) of the filesystems, so that clients can now cache the metadata entities (again like inodes) and could use these cached entities during Data IO operation of read and writes, without consulting the MDSs for every Data IO operation. Whenever there is a change in the status-quo of the entity the Chel-FS client would be notified to take appropriate actions (either give up the locks/delegation or update the cached metadata entity)
 
+Chel-FS MDS would also host client capabilities what is permissions on a Chel-FS client level to do operations of read,write,delete etc. This way Chel-FS Clients can restricted or permitted to enable certain feature or IO operation.
 ### FS layout on DAOS containers
 ### Distributed Transaction Synchronization
 
@@ -68,7 +77,7 @@ Since storage/DAOS is ubiquitous i.e accessed by all the MDS without having any 
 
 # Chel-FS Internal Components
 
-# Metadata Structures(Proto)
+# Metadata Entities in Chel-fs and their Structures(Proto)
 
 # HLD for File Operation
 
