@@ -35,7 +35,24 @@ there is a need that this compute responsibility is distributed among disjoint f
 ## Chel-FS Metadata Service (MDS)  
 As defined above, Chel-FS MDS (referred as MDS in the future) is responsible for following,
 ### Sharded Compute Responsibility
+Chel-FS metadata is sharded amongst a N number of MDS. The sharding of metadata entities is done on some properties of the entity For example:
+It would usual to shard inodes using the inode's primary parent inode. (Note: A inode can have multiple parents due to multiple hardlinks, though this is exception for directories, as directories will have only 1 parent inode). 
+The sharding is dictated on the following factors,
+1. Optimal Layout of Chel-FS metadata on DAOS Objects. 
+2. Disjoint Metadata Operations(most of the times) i,e 1 Metadata operation would most of the time involve 1 MDS.
+   1. Less number of network hops for 1 Metadata operation
+   2. Less number OR None distributed transaction/s in a metadata operation 
+3. Ease of Predictive Caching (Read-ahead caching)
+4. Ease of rebuild/reload during a failover or failback of MDS.
+5. 
+(TODO : Details in LLD of MDS Sharding)
+
+Chel-FS cluster could have multiple file systems created and all the metadata of all these filesystems would be sharded on N number of MDS of the cluster.
+
+Since storage/DAOS is ubiquitous i.e accessed by all the MDS without having any storage affinity, The number of MDS in a cluster can be increased or decreased seamlessly, depending on Compute requirements of the workload.
+
 ### Delegate Locks and Capabilities
+
 ### FS layout on DAOS containers
 ### Distributed Transaction Synchronization
 
