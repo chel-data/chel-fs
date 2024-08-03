@@ -15,7 +15,7 @@
   - [Chel-FS Snapshots](#chel-fs-snapshots)
   - [Chel-FS Quotas](#chel-fs-quotas)
   - [Chel-Helm](#chel-helm)
-- [Chel-FS Components](#chel-fs-components)
+- [Chel-FS Internal Components](#chel-fs-internal-components)
 - [Metadata Structures(Proto)](#metadata-structuresproto)
 - [HLD for File Operation](#hld-for-file-operation)
 
@@ -23,12 +23,15 @@
 
 Chel File System(Chel-FS), is a disaggregated software defined distributed file system (POSIX compliant), built on top of DAOS (https://github.com/daos-stack/daos). The main objective of Chel-FS is to provide scalable file system metadata management at the same time, keep the stock performance/scale of DAOS for file data operations. Chel-FS is aimed for workloads that require high performance and scalable file system operations.
 
+![Chel-FS Architecture](./chel-fs-hl-block.drawio)
+
 # Design Principles
 
 ## Disaggregated Distributed File System Service
 The main objective of Chel-FS is to provide a disaggregated Distributed File System Service over DAOS Containers/Pool.
 DAOS is capable to handle high volumes of Parallel Data Operations. But for high volumes of small file metadata operations
 there is a need that this compute responsibility is distributed among disjoint file system metadata compute entities. We call these file system metadata compute entities as Chel-FS MDS.
+
 ## Chel-FS Metadata Service (MDS)  
 As defined above, Chel-FS MDS (referred as MDS in the future) is responsible for following,
 ### Sharded Compute Responsibility
@@ -46,7 +49,7 @@ As defined above, Chel-FS MDS (referred as MDS in the future) is responsible for
 
 ## Chel-Helm
 
-# Chel-FS Components
+# Chel-FS Internal Components
 
 # Metadata Structures(Proto)
 
