@@ -63,6 +63,19 @@ Chel-FS MDS would be hosting Chel-FS client locks/delegation on metadata entitie
 
 Chel-FS MDS would also host client capabilities what is permissions on a Chel-FS client level to do operations of read,write,delete etc. This way Chel-FS Clients can restricted or permitted to enable certain feature or IO operation.
 ### FS layout on DAOS containers
+Chel-FS would maps a user filesystem to a DAOS container for the following reasons,
+1. DAOS Containers (Extracts from https://docs.daos.io/v2.4/overview/storage/#daos-container)
+   1. "A container represents an object address space inside a DAOS pool"
+      This means all the objects of a Chel-FS filesystem can be tucked in a container, like a unique namespace.
+   2. Each container has it's own attributes and capabilities & once opened an application "may share this handle with any or all of its peers" processes
+      This means all the MDSs which are serving a Chel-FS filesystem will be sharing a handle with all it's capabilities and authorizations.
+   3. "Objects in a container may have different schemas for data distribution and redundancy over targets"
+      This means a Chel-FS filesystems can map it's metadata object to a different distribution and redundancy scheme than the data objects.
+      Metadata Object can use 3 way replica and Data Object can use Erasure Coding.
+   4. "A container is the basic unit of transaction and versioning" & "The DAOS transaction API allows to combine multiple object updates into a single atomic transaction"
+      This means MDSs can use this transaction API for multiple entities atomic updates
+      Also a container snapshot would be mapped to a Chel-FS snapshot.(more about this [later](#chel-fs-snapshots))  
+      
 ### Distributed Transaction Synchronization
 
 ## Chel-FS Client
