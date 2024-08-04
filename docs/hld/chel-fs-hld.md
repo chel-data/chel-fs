@@ -83,8 +83,9 @@ Chel-FS would maps a user filesystem to a DAOS container for the following reaso
 DAOS container does provide transaction which involves 1 or many Objects (which can be any of the filesystem entities).
 As mentioned in https://docs.daos.io/v2.6/overview/transaction/#distributed-transactions
 ```
-> Unlike POSIX, the DAOS API does not impose any worst-case concurrency control mechanism to address conflicting I/O operations. Instead, individual I/O  
-operations are tagged with a different epoch and applied in epoch order, regardless of execution order. This baseline model delivers the maximum  
+Unlike POSIX, the DAOS API does not impose any worst-case concurrency control mechanism to address  
+conflicting I/O operations. Instead, individual I/O operations are tagged with a different epoch  
+and applied in epoch order, regardless of execution order. This baseline model delivers the maximum  
 scalability and performance to data models and applications that do not generate conflicting I/O workload.
 ```
 This is incredible but for MDS Transaction (metadata operation which could involve multiple entities) would required a level of isolation when the transactions happen. MDS Sharding model makes sure that no 2 MDS would work on same entities for most of the metadata operations. But some metadata operations require some level of coordination between 2 MDS eg: Rename/Move of file/Directories between 2 Parent directories. In this case 1 MDS would signal the other MDS that it would do the transaction on behalf of both, i.e unlink on 1st Parent and link on the 2nd Parent.
