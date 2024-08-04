@@ -7,7 +7,6 @@
   - [Disaggregated Distributed File System Service](#disaggregated-distributed-file-system-service)
   - [Chel-FS Metadata Service (MDS)](#chel-fs-metadata-service-mds)
     - [Sharded Compute Responsibility](#sharded-compute-responsibility)
-      - [Adding and removing MDSs](#adding-and-removing-mdss)
     - [Delegate Locks and Capabilities](#delegate-locks-and-capabilities)
     - [FS layout on DAOS containers](#fs-layout-on-daos-containers)
     - [Distributed Transaction Synchronization](#distributed-transaction-synchronization)
@@ -54,10 +53,10 @@ it is most likely to shard inodes using the inode's primary parent inode. (Note:
 
 
 Chel-FS cluster could have multiple file systems and all the metadata of these filesystems would be sharded on N number of MDS of the cluster.
-#### Adding and removing MDSs
-The User/Admin should be able to add or remove MDSs depending on performance or cost needs.
-Since storage/DAOS is ubiquitous (i.e accessed by all the MDS without having any storage affinity),
-The number of MDS in a cluster can be increased or decreased seamlessly, depending on compute requirements of the workload or cost.
+ Adding and removing MDSs
+User/Admin should be able to add or remove MDSs depending on performance or cost needs.
+e storage/DAOS is ubiquitous (i.e accessed by all the MDS without having any storage affinity),
+number of MDS in a cluster can be increased or decreased seamlessly, depending on compute requirements of the workload or cost.
 ### Delegate Locks and Capabilities
 Chel-FS MDS would be hosting Chel-FS client locks/delegation on metadata entities (like Inode) of the filesystems, so that clients can now cache the metadata entities (again like inodes) and could use these cached entities during Data IO operation of read and writes, without consulting the MDSs for every Data IO operation. Whenever there is a change in the status-quo of the entity the Chel-FS client would be notified to take appropriate actions (either give up the locks/delegation or update the cached metadata entity)
 
@@ -84,11 +83,12 @@ Chel-FS would maps a user filesystem to a DAOS container for the following reaso
 DAOS container does provide transaction which involves 1 or many Objects (which can be any of the filesystem entities).
 As mentioned in https://docs.daos.io/v2.6/overview/transaction/#distributed-transactions
 ```
-"Unlike POSIX, the DAOS API does not impose any worst-case concurrency control mechanism to address conflicting I/O operations. Instead, individual I/O operations are tagged with a different epoch and applied in epoch order, regardless of execution order. This baseline model delivers the maximum scalability and performance to data models and applications that do not generate conflicting I/O workload."
+Unlike POSIX, the DAOS API does not impose any worst-case concurrency control mechanism to address conflicting I/O operations. Instead, individual I/O operations are tagged with a different epoch and applied in epoch order, regardless of execution order. This baseline model delivers the maximum scalability and performance to data models and applications that do not generate conflicting I/O workload.
 ```
 This is incredible but for MDS Transaction (metadata operation which could involve multiple entities) would required a level of isolation when the transactions happen. MDS Sharding model makes sure that no 2 MDS would work on same entities for most of the metadata operations. But some metadata operations require some level of coordination between 2 MDS eg: Rename/Move of file/Directories between 2 Parent directories. In this case 1 MDS would signal the other MDS that it would do the transaction on behalf of both, i.e unlink on 1st Parent and link on the 2nd Parent.
 
 The MDS should have a Distributed Transaction Synchronization mechanism.
+
 ## Chel-FS Client
 
 ## DAOS and Chel-FS entity relationship  
