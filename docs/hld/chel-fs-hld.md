@@ -3,7 +3,7 @@
 ## Table of Contents
 
 - [Chel-FS](#chel-fs)
-- [Design Principles](#design-principles)
+- [High Level Design(HLD) Principles/Requirements and Assumptions](#high-level-designhld-principlesrequirements-and-assumptions)
   - [Disaggregated Distributed File System Service](#disaggregated-distributed-file-system-service)
   - [Chel-FS Metadata Service (MDS)](#chel-fs-metadata-service-mds)
     - [Sharded Compute Responsibility](#sharded-compute-responsibility)
@@ -25,7 +25,7 @@ Chel File System(Chel-FS), is a disaggregated software defined distributed file 
 
 ![Image](chel-fs-hl-block.drawio.png)
 
-# Design Principles
+# High Level Design(HLD) Principles/Requirements and Assumptions
 
 ## Disaggregated Distributed File System Service
 The main objective of Chel-FS is to provide a disaggregated Distributed File System Service over DAOS Containers/Pool.
@@ -73,6 +73,7 @@ Chel-FS would maps a user filesystem to a DAOS container for the following reaso
       Metadata Object can use 3 way replica and Data Object can use Erasure Coding.
    4. "A DAOS object can be accessed through different APIs
         Multi-level key-array, Key-value and Array API"
+        (https://github.com/daos-stack/daos/blob/master/src/object/README.md)
       This means Chel-FS entities like Directory and Files can be easily mapped to one of these Object Types.
       (inspiration from https://github.com/daos-stack/daos/blob/master/src/client/dfs/README.md)
    5. "A container is the basic unit of transaction and versioning" & "The DAOS transaction API allows to combine multiple object updates into a single atomic transaction"
@@ -112,6 +113,16 @@ Whats missing now in DAOS Container Snapshot
 3. Writable snapshots or clones - (Aspirational)
 
 ## Chel-FS Quotas
+Chel-FS would support filesystem level quotas i.e on the capacity of the filesystem.
+For that Chel-FS has to either do asynchronous space counting at a filesystem level OR Rely on space counting by DAOS Container
+
+Currently, (when this was written) DAOS doesn't do space counting at container level (Refer : https://github.com/daos-stack/daos/blob/846b57aea5bac7a4523e426244ac6a3312e9c739/src/include/daos_types.h#L130) and there is nothing in DAOS roadmap that would suggest the same
+(https://daos.io/19-2). The rational behind that the space allocation is done at the pool level and a container level space counting would
+be complex and could have it's performance cost.
+Said that, DAOS does do space count at a pool level.(https://github.com/daos-stack/daos/blob/846b57aea5bac7a4523e426244ac6a3312e9c739/src/include/daos_pool.h#L172)
+
+Taking the above into account, Chel-FS would have to do asynchronous space counting at a filesystem level (excluding the snapshot space in the beginning)
+and this would be more of an approximation rather than exact figure. Once this is done, some semblance of filesystem quotas can be implemented.
 
 ## Chel-Helm
 
