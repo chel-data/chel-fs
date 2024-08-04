@@ -81,7 +81,14 @@ Chel-FS would maps a user filesystem to a DAOS container for the following reaso
       Also a container snapshot would be mapped to a Chel-FS snapshot.(more about this [later](#chel-fs-snapshots))
 
 ### Distributed Transaction Synchronization
+DAOS container does provide transaction which involves 1 or many Objects (which can be any of the filesystem entities).
+As mentioned in https://docs.daos.io/v2.6/overview/transaction/#distributed-transactions
+```
+"Unlike POSIX, the DAOS API does not impose any worst-case concurrency control mechanism to address conflicting I/O operations. Instead, individual I/O operations are tagged with a different epoch and applied in epoch order, regardless of execution order. This baseline model delivers the maximum scalability and performance to data models and applications that do not generate conflicting I/O workload."
+```
+This is incredible but for MDS Transaction (metadata operation which could involve multiple entities) would required a level of isolation when the transactions happen. MDS Sharding model makes sure that no 2 MDS would work on same entities for most of the metadata operations. But some metadata operations require some level of coordination between 2 MDS eg: Rename/Move of file/Directories between 2 Parent directories. In this case 1 MDS would signal the other MDS that it would do the transaction on behalf of both, i.e unlink on 1st Parent and link on the 2nd Parent.
 
+The MDS should have a Distributed Transaction Synchronization mechanism.
 ## Chel-FS Client
 
 ## DAOS and Chel-FS entity relationship  
@@ -93,11 +100,13 @@ Since a Chel-FS filesystem is mapped to a DAOS container, it would inherit this 
 DAOS containers can be snapshot-ed (https://github.com/daos-stack/daos/blob/master/docs/overview/transaction.md#container-snapshot)
 "DAOS snapshots are very lightweight and are tagged with the epoch associated with the time when the snapshot was created. Once successfully created, a snapshot remains readable until it is explicitly destroyed. The content of a container can be rolled back to a particular snapshot."
 This means using DAOS container snapshots we can snapshot Chel-FS filesystem what is associated with that DAOS Container.
+(https://github.com/daos-stack/daos/blob/master/src/include/daos_cont.h)
+
 
 Whats missing now in DAOS Container Snapshot
-1. Snap-diff - This has to be implemented in DAOS (VOS Aggregation) and then consumed by Chel-FS.
+1. Snap-diff - This has to be implemented in DAOS and then consumed by Chel-FS.
 2. Snapshot presentation in DFS Containers - Chel-FS has to implement this.
-3. Writable snapshots or clones.
+3. Writable snapshots or clones - (Aspirational)
 
 ## Chel-FS Quotas
 
