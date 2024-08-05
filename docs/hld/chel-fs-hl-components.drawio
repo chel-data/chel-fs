@@ -56,7 +56,7 @@
           <mxGeometry x="387.5" y="-360" width="120" height="40" as="geometry" />
         </mxCell>
         <mxCell id="QLG-2rltZJWTpDKEY9sg-17" value="NFS/SMB Integrations Class" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="383.5" y="-214" width="120" height="40" as="geometry" />
+          <mxGeometry x="389.5" y="-260" width="120" height="40" as="geometry" />
         </mxCell>
         <mxCell id="QLG-2rltZJWTpDKEY9sg-18" value="Snapshot&lt;br&gt;Logic" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
           <mxGeometry x="-68.5" y="220" width="120" height="40" as="geometry" />
@@ -112,10 +112,10 @@
           <mxGeometry x="387.5" y="-312" width="122.5" height="45" as="geometry" />
         </mxCell>
         <mxCell id="QLG-2rltZJWTpDKEY9sg-31" value="Snapshot Logic" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="537.5" y="-230" width="120" height="30" as="geometry" />
+          <mxGeometry x="537.5" y="-236" width="120" height="30" as="geometry" />
         </mxCell>
         <mxCell id="QLG-2rltZJWTpDKEY9sg-32" value="Quotas&lt;br&gt;Logic" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="537.5" y="-272" width="120" height="35" as="geometry" />
+          <mxGeometry x="537.5" y="-272" width="120" height="32" as="geometry" />
         </mxCell>
         <mxCell id="QLG-2rltZJWTpDKEY9sg-49" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="870" y="150" width="350" height="340" as="geometry" />
