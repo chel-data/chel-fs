@@ -11,11 +11,12 @@
     - [FS layout on DAOS containers](#fs-layout-on-daos-containers)
     - [Distributed Transaction Synchronization](#distributed-transaction-synchronization)
   - [Chel-FS Client](#chel-fs-client)
-  - [DAOS and Chel-FS entity relationship](#daos-and-chel-fs-entity-relationship)
   - [Chel-FS Snapshots](#chel-fs-snapshots)
   - [Chel-FS Quotas](#chel-fs-quotas)
   - [Chel-Helm](#chel-helm)
+  - [Parallelism to the Core](#parallelism-to-the-core)
 - [Chel-FS Internal Components](#chel-fs-internal-components)
+- [DAOS and Chel-FS entity relationship](#daos-and-chel-fs-entity-relationship)
 - [Metadata Entities in Chel-fs and their Structures(Proto)](#metadata-entities-in-chel-fs-and-their-structuresproto)
 - [HLD for File Operation](#hld-for-file-operation)
 
@@ -95,7 +96,6 @@ The MDS should have a Distributed Transaction Synchronization mechanism.
 
 ## Chel-FS Client
 
-## DAOS and Chel-FS entity relationship  
 
 ## Chel-FS Snapshots
 Chel-FS would provide snapshot feature at a filesystem level (Create and rollback).
@@ -126,7 +126,12 @@ and this would be more of an approximation rather than exact figure. Once this i
 
 ## Chel-Helm
 
+## Parallelism to the Core
+
 # Chel-FS Internal Components
+![Image](chel-fs-hl-components.drawio.png)
+
+# DAOS and Chel-FS entity relationship  
 
 # Metadata Entities in Chel-fs and their Structures(Proto)
 
