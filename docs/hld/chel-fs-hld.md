@@ -56,7 +56,7 @@ it is most likely to shard inodes using the inode's primary parent inode. (Note:
 Chel-FS cluster could have multiple file systems and all the metadata of these filesystems would be sharded on N number of MDS of the cluster.
  Adding and removing MDSs
 User/Admin should be able to add or remove MDSs depending on performance or cost needs.
-e storage/DAOS is ubiquitous (i.e accessed by all the MDS without having any storage affinity),
+We can do this because storage/DAOS is ubiquitous (i.e accessed by all the MDS without having any storage affinity),
 number of MDS in a cluster can be increased or decreased seamlessly, depending on compute requirements of the workload or cost.
 ### Delegate Locks and Capabilities
 Chel-FS MDS would be hosting Chel-FS client locks/delegation on metadata entities (like Inode) of the filesystems, so that clients can now cache the metadata entities (again like inodes) and could use these cached entities during Data IO operation of read and writes, without consulting the MDSs for every Data IO operation. Whenever there is a change in the status-quo of the entity the Chel-FS client would be notified to take appropriate actions (either give up the locks/delegation or update the cached metadata entity)
@@ -131,7 +131,8 @@ and this would be more of an approximation rather than exact figure. Once this i
 # Chel-FS Internal Components
 ![Image](chel-fs-hl-components.drawio.png)
 
-# DAOS and Chel-FS entity relationship  
+# DAOS and Chel-FS entity relationship
+![Image](daos-chel-fs-layout-scheme.drawio.png)
 
 # Metadata Entities in Chel-fs and their Structures(Proto)
 
