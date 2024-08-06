@@ -136,10 +136,15 @@ Explaination **< TODO >**
 
 # Chel-FS entity to DAOS Object relationship
 
-| Chel-FS Entity | DAOS Object      |
-| :------------- | ---------------- |
-| Directory      | Multi key Object |
-| File           | Array Object     |
+| Chel-FS Entity   | DAOS Object      |
+| :--------------- | ---------------- |
+| Directory        | Multi key Object |
+| File             | Array Object     |
+| File Xattrs      |                  |
+| Directory Xattrs |                  |
+| File ACLS        |                  |
+| Directory ACLS   |                  |
+
 
 ## Directory
 **< TODO >**
