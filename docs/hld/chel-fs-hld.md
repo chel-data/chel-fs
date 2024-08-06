@@ -140,8 +140,8 @@ Explaination **< TODO >**
 | :--------------------- | -------------------------------------------------------------------------- |
 | Directory              | Multi key Object (Dentries-Inode & xattrs/acls of the directory)           |
 | File                   | Array Object(for file data)  + Multi key Object (for file xattrs and ACLS) |
-| File Xattrs & ACL      | Embedded in the files Multi key object of the file                         |
-| Directory Xattrs & ACL | Embedded in the files Multi key object of the Directory                    |
+| File Xattrs & ACL      | Embedded in the Multi key object of the file                         |
+| Directory Xattrs & ACL | Embedded in the Multi key object of the Directory                    |
 
 
 
