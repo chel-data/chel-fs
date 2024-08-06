@@ -1,0 +1,286 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.5 Chrome/126.0.6478.183 Electron/31.3.0 Safari/537.36" version="24.7.5">
+  <diagram name="Page-1" id="uK7_JxeQQXMR1zf9waIi">
+    <mxGraphModel dx="2218" dy="1938" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-15" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="-380" width="350" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-96" y="150" width="350" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="-81" y="160" width="315" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-3" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="377.5" y="-370" width="295" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-4" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-81" y="369" width="150" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-5" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="84" y="369" width="150" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-6" value="MD Cache" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="-68.5" y="170" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-7" value="Lock/Lease/&lt;div&gt;Delegation Class&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="-68.5" y="270" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-8" value="Quotas&lt;br&gt;logic" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="94" y="220" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-9" value="Client MD Cache" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="537.5" y="-360" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-10" value="Lock/Lease/&lt;div&gt;Delegation Class&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="537.5" y="-317" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-11" value="DAOS Client Library" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-68.5" y="409" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-12" value="Object Store class" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-68.5" y="369" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-13" value="Chel-RPC Class" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="94" y="369" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-92" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=4;strokeColor=#FF3333;" edge="1" parent="1" source="QLG-2rltZJWTpDKEY9sg-14" target="QLG-2rltZJWTpDKEY9sg-59">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-14" value="Mercury RPC" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="96.5" y="409" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-16" value="FUSE Class" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="387.5" y="-360" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-17" value="NFS/SMB Integrations Class" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="389.5" y="-260" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-18" value="Snapshot&lt;br&gt;Logic" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="-68.5" y="220" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-19" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="368.5" y="-144" width="150" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-20" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="533.5" y="-144" width="150" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-21" value="DAOS Client Library" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="381" y="-104" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-22" value="Object Store class" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="381" y="-144" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-23" value="Chel-RPC Class" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="543.5" y="-144" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-81" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;strokeWidth=4;strokeColor=#FF3333;" edge="1" parent="1" source="QLG-2rltZJWTpDKEY9sg-24" target="QLG-2rltZJWTpDKEY9sg-14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="606" y="439" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-24" value="Mercury RPC" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="546" y="-104" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-26" value="Chel-FS MDS class" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="36.5" y="320" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-87" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;dashed=1;" edge="1" parent="1" source="QLG-2rltZJWTpDKEY9sg-27">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="80" y="-280" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="280" y="190" />
+              <mxPoint x="280" y="-280" />
+              <mxPoint x="132" y="-280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-27" value="Chel-Helm&lt;br&gt;RPC" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="95.25" y="167.5" width="122.5" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-28" value="MD Logic" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="94" y="272.5" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-29" value="Chel-FS Client class" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="487.5" y="-190" width="75" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-30" value="Chel-Helm&lt;br&gt;RPC" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="387.5" y="-312" width="122.5" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-31" value="Snapshot Logic" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="537.5" y="-236" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-32" value="Quotas&lt;br&gt;Logic" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="537.5" y="-272" width="120" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-49" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="870" y="150" width="350" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-50" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="885" y="160" width="315" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-51" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1049" y="369" width="150" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-52" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="885" y="369" width="150" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-53" value="MD Cache" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="897.5" y="170" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-54" value="Lock/Lease/&lt;div&gt;Delegation Class&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="170" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-55" value="Quotas&lt;br&gt;logic" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="220" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-56" value="DAOS Client Library" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1061.5" y="409" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-57" value="Object Store class" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1061.5" y="369" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-58" value="Chel-RPC Class" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="895" y="369" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-59" value="Mercury RPC" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="897.5" y="409" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-60" value="Snapshot&lt;br&gt;Logic" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="897.5" y="220" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-61" value="Chel-FS MDS class" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1002.5" y="320" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-62" value="Chel-Helm&lt;br&gt;RPC" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="897.5" y="270" width="122.5" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-63" value="Misc.." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="272.5" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-64" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="154" y="716" width="690" height="114" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-65" value="" style="endArrow=none;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-120" y="680" as="sourcePoint" />
+            <mxPoint x="1200" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-66" value="DAOS container" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="174" y="736" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-67" value="DAOS container" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="314" y="736" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-68" value="DAOS container" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="704" y="736" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-69" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="QLG-2rltZJWTpDKEY9sg-67" target="QLG-2rltZJWTpDKEY9sg-68">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="534" y="796" as="sourcePoint" />
+            <mxPoint x="584" y="746" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-70" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="QLG-2rltZJWTpDKEY9sg-66">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="233.5" y="680" as="sourcePoint" />
+            <mxPoint x="234" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-71" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="QLG-2rltZJWTpDKEY9sg-67">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="373.5" y="680" as="sourcePoint" />
+            <mxPoint x="374" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-72" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="QLG-2rltZJWTpDKEY9sg-68">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="764" y="680" as="sourcePoint" />
+            <mxPoint x="764.5" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-73" value="DAOS Pool" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="394" y="796" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-74" value="TCP/RDMA" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="84" y="680" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-75" value="" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;rounded=0;fillColor=#330066;" edge="1" parent="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <mxPoint x="-8" y="680" as="sourcePoint" />
+            <mxPoint x="-7.75" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-76" value="" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;rounded=0;fillColor=#330066;" edge="1" parent="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <mxPoint x="1121" y="679" as="sourcePoint" />
+            <mxPoint x="1121.25" y="469" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-77" value="" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;rounded=0;fillColor=#330066;" edge="1" parent="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <mxPoint x="420" y="680" as="sourcePoint" />
+            <mxPoint x="425.25" y="-44" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-80" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=4;strokeColor=#FF3333;startArrow=classic;startFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="QLG-2rltZJWTpDKEY9sg-24" target="QLG-2rltZJWTpDKEY9sg-59">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="610" y="20" as="sourcePoint" />
+            <mxPoint x="983.5" y="617" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="606" y="439" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-83" value="Chel-Helm" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-112" y="-320" width="240" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-91" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;" edge="1" parent="1" source="QLG-2rltZJWTpDKEY9sg-85" target="QLG-2rltZJWTpDKEY9sg-83">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-85" value="etcd" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="-22" y="-174" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-86" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1.004;entryY=0.39;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=classic;startFill=1;dashed=1;" edge="1" parent="1" source="QLG-2rltZJWTpDKEY9sg-30" target="QLG-2rltZJWTpDKEY9sg-83">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="280" y="-289" />
+              <mxPoint x="280" y="-281" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-89" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;dashed=1;" edge="1" parent="1" source="QLG-2rltZJWTpDKEY9sg-62">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="130" y="-280" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="840" y="293" />
+              <mxPoint x="840" y="110" />
+              <mxPoint x="280" y="110" />
+              <mxPoint x="280" y="-281" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-93" value="Chel-FS MDS 1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="46.5" y="500" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-94" value="Chel-FS MDS N" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="500" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-95" value="Chel-FS MDS N" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="495" y="-10" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-96" value="TCP/RDMA" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="518.5" y="439" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QLG-2rltZJWTpDKEY9sg-97" value="TCP" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="290" y="80" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
