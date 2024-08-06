@@ -136,12 +136,12 @@ Explaination **< TODO >**
 
 # Chel-FS entity to DAOS Object relationship
 
-| Chel-FS Entity         | DAOS Object                                                                |
-| :--------------------- | -------------------------------------------------------------------------- |
-| Directory              | Multi key Object (Dentries-Inode & xattrs/acls of the directory)           |
-| File                   | Array Object(for file data)  + Multi key Object (for file xattrs and ACLS) |
-| File Xattrs & ACL      | Embedded in the Multi key object of the file                               |
-| Directory Xattrs & ACL | Embedded in the Multi key object of the Directory                          |
+| Chel-FS Entity         | DAOS Object                                                                             |
+| :--------------------- | --------------------------------------------------------------------------------------- |
+| Directory              | Multi-level key-array  Object (Dentries-Inode & xattrs/acls of the directory)           |
+| File                   | Array Object(for file data)  + Multi-level key-array  Object (for file xattrs and ACLS) |
+| File Xattrs & ACL      | Embedded in the Multi-level key-array  object of the file                               |
+| Directory Xattrs & ACL | Embedded in the Multi-level key-array  object of the Directory                          |
 
 
 
