@@ -95,7 +95,7 @@ This is incredible but for MDS Transaction (metadata operation which could invol
 The MDS should have a Distributed Transaction Synchronization mechanism.
 
 ## Chel-FS Client
-
+<TODO>
 
 ## Chel-FS Snapshots
 Chel-FS would provide snapshot feature at a filesystem level (Create and rollback).
@@ -125,16 +125,34 @@ Taking the above into account, Chel-FS would have to do asynchronous space count
 and this would be more of an approximation rather than exact figure. Once this is done, some semblance of filesystem quotas can be implemented.
 
 ## Chel-Helm
+<TODO>
 
 ## Parallelism to the Core
+<TODO>
 
 # Chel-FS Internal Components
+Explaination <TODO>
 ![Image](chel-fs-hl-components.drawio.png)
 
-# DAOS and Chel-FS entity relationship
+# Chel-FS entity to DAOS Object relationship
+
+| Chel-FS Entity | DAOS Object      |
+| :------------- | ---------------- |
+| Directory      | Multi key Object |
+| File           | Array Object     |
+
+## Directory
+<TODO>
+
+## File
+<TODO>
+
+## Example
+
 ![Image](daos-chel-fs-layout-scheme.drawio.png)
 
 # Metadata Entities in Chel-fs and their Structures(Proto)
+<TODO>
 
 # HLD for File Operation
-
+<TODO>
