@@ -136,14 +136,13 @@ Explaination **< TODO >**
 
 # Chel-FS entity to DAOS Object relationship
 
-| Chel-FS Entity   | DAOS Object      |
-| :--------------- | ---------------- |
-| Directory        | Multi key Object |
-| File             | Array Object     |
-| File Xattrs      |                  |
-| Directory Xattrs |                  |
-| File ACLS        |                  |
-| Directory ACLS   |                  |
+| Chel-FS Entity         | DAOS Object                                                                |
+| :--------------------- | -------------------------------------------------------------------------- |
+| Directory              | Multi key Object (Dentries-Inode & xattrs/acls of the directory)           |
+| File                   | Array Object(for file data)  + Multi key Object (for file xattrs and ACLS) |
+| File Xattrs & ACL      | Embedded in the files Multi key object of the file                         |
+| Directory Xattrs & ACL | Embedded in the files Multi key object of the Directory                    |
+
 
 
 ## Directory
@@ -153,7 +152,7 @@ Explaination **< TODO >**
 **< TODO >**
 
 ## Example
-
+**Image has to be updated**
 ![Image](daos-chel-fs-layout-scheme.drawio.png)
 
 # Metadata Entities in Chel-fs and their Structures(Proto)
